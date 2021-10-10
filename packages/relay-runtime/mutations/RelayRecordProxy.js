@@ -17,6 +17,7 @@ import type {Arguments} from '../store/RelayStoreUtils';
 import type {DataID} from '../util/RelayRuntimeTypes';
 import type RelayRecordSourceMutator from './RelayRecordSourceMutator';
 import type RelayRecordSourceProxy from './RelayRecordSourceProxy';
+import { validateRecord } from '../util/validate-record';
 
 const {generateClientID} = require('../store/ClientID');
 const {getStableStorageKey} = require('../store/RelayStoreUtils');
@@ -94,6 +95,8 @@ class RelayRecordProxy implements RecordProxy {
       'RelayRecordProxy#setLinkedRecord(): Expected a record, got `%s`.',
       record,
     );
+
+    validateRecord(name, record);
     const storageKey = getStableStorageKey(name, args);
     const linkedID = record.getDataID();
     this._mutator.setLinkedRecordID(this._dataID, storageKey, linkedID);

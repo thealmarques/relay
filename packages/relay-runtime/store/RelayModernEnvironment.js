@@ -44,6 +44,8 @@ import type {
   Store,
   StoreUpdater,
 } from './RelayStoreTypes';
+import Schema from '../util/relay-utils/Schema';
+import { RelaySchema } from './RelaySchema';
 
 const RelayDefaultHandlerProvider = require('../handlers/RelayDefaultHandlerProvider');
 const {
@@ -61,6 +63,10 @@ const OperationExecutor = require('./OperationExecutor');
 const RelayPublishQueue = require('./RelayPublishQueue');
 const RelayRecordSource = require('./RelayRecordSource');
 const invariant = require('invariant');
+
+export type ValidatorConfig = {|
+  +source: ?string,
+|};
 
 export type EnvironmentConfig = {|
   +configName?: string,
@@ -81,6 +87,7 @@ export type EnvironmentConfig = {|
   +isServer?: boolean,
   +requiredFieldLogger?: ?RequiredFieldLogger,
   +shouldProcessClientComponents?: ?boolean,
+  +validator?: ?ValidatorConfig,
 |};
 
 class RelayModernEnvironment implements IEnvironment {
@@ -105,6 +112,11 @@ class RelayModernEnvironment implements IEnvironment {
   requiredFieldLogger: RequiredFieldLogger;
 
   constructor(config: EnvironmentConfig) {
+    if (config.validator) {
+      const schema = Schema.create(config.validator.source);
+      RelaySchema.set(schema);
+    }
+
     this.configName = config.configName;
     this._treatMissingFieldsAsNull = config.treatMissingFieldsAsNull === true;
     const operationLoader = config.operationLoader;
