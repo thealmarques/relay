@@ -6,7 +6,7 @@ export function validateRecord(name, record) {
     const fields = schema.getFields(type);
 
     fields.map((field) => {
-      if (schema.isNonNull(field.type) && !record.getValue(field.name)) {
+      if (process.env.NODE_ENV === 'development' && schema.isNonNull(field.type) && !record.getValue(field.name)) {
         console.warn(`Oh no! we forgot to create & set the ${type} ${field.name}! ${field.name} should be non-null!`);
       }
     });
